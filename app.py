@@ -8,8 +8,8 @@ def health():
 
 @app.route("/news")
 def news():
-    return jsonify({
-        "fact": [],
-        "structure": [],
-        "sensation": []
-    })
+   return jsonify({
+    "fact": "米国株が上昇",
+    "structure": "AI期待と地政学",
+    "sensation": "都市の光が揺れる"
+})
