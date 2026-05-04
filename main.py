@@ -3,7 +3,9 @@ import requests
 
 app = FastAPI()
 
-API_KEY = "YOUR_API_KEY"
+import os
+
+API_KEY = os.getenv("NEWS_API_KEY")
 BASE_URL = "https://newsapi.org/v2/top-headlines"
 
 params = {
