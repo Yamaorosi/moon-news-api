@@ -11,7 +11,7 @@ BASE_URL = "https://newsapi.org/v2/top-headlines"
 params = {
     "country": "us",
     "category": "technology",
-    "pageSize": 5,
+    "pageSize": 2,
     "apiKey": API_KEY
 }
 
