@@ -13,7 +13,7 @@
 
 <script>
 async function loadNews() {
-  const res = await fetch("https://moon-news-api.onrender.com/news");
+  const res = await fetch("/news");
   const data = await res.json();
   document.getElementById("output").textContent =
     JSON.stringify(data, null, 2);
