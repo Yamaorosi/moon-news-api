@@ -5,6 +5,7 @@ import os
 app = Flask(__name__)
 
 API_KEY = os.getenv("NEWS_API_KEY")
+print("API_KEY:", API_KEY)
 BASE_URL = "https://newsapi.org/v2/top-headlines"
 
 
