@@ -1,22 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <title>moon news</title>
+  <meta charset="UTF-8">
+  <title>News App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    .title {
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Moon News</h1>
+<h1>📰 News Feed</h1>
+<button onclick="loadNews()">ニュース取得</button>
 
-<button onclick="loadNews()">取得</button>
-
-<pre id="output"></pre>
+<div id="news"></div>
 
 <script>
 async function loadNews() {
   const res = await fetch("/news");
   const data = await res.json();
-  document.getElementById("output").textContent =
-    JSON.stringify(data, null, 2);
+
+  const container = document.getElementById("news");
+  container.innerHTML = "";
+
+  data.forEach(article => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="title">${article.title}</div>
+      <div>${article.source}</div>
+      <a href="${article.url}" target="_blank">記事を見る</a>
+    `;
+
+    container.appendChild(div);
+  });
 }
 </script>
 
