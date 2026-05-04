@@ -6,6 +6,8 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("NEWS_API_KEY")
 print("API_KEY:", API_KEY)
+if not API_KEY:
+    print("❌ API_KEYが設定されてない")
 BASE_URL = "https://newsapi.org/v2/top-headlines"
 
 
