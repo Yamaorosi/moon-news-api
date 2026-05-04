@@ -3,7 +3,11 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 @app.route("/")
-def health():
+def home():
+    return "<h1>Moon News</h1>"
+
+@app.route("/status")
+def status():
     return jsonify({"status": "ok"})
 
 @app.route("/news")
