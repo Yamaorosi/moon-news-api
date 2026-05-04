@@ -1,1 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>moon news</title>
+</head>
+<body>
 
+<h1>Moon News</h1>
+
+<button onclick="loadNews()">取得</button>
+
+<pre id="output"></pre>
+
+<script>
+async function loadNews() {
+  const res = await fetch("https://moon-news-api.onrender.com/news");
+  const data = await res.json();
+  document.getElementById("output").textContent =
+    JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
