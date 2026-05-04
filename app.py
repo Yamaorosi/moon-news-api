@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "<h1>Moon News</h1>"
+    return render_template("index.html")
 
 @app.route("/status")
 def status():
