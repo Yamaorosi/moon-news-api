@@ -1,112 +1,97 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Moon News</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #f5f5f5;
-    }
+<meta charset="UTF-8">
+<title>News Feed</title>
 
-    .app {
-      display: flex;
-      min-height: 100vh;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f8fa;
+}
 
-    .sidebar {
-      width: 220px;
-      background: #fff;
-      border-right: 1px solid #ddd;
-      padding: 16px;
-    }
+.container {
+  max-width: 600px;
+  margin: auto;
+}
 
-    .main {
-      flex: 1;
-      padding: 20px;
-    }
+.card {
+  background: white;
+  border-bottom: 1px solid #e6ecf0;
+  padding: 12px 14px;
+}
 
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    
-    .card-title {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-    
-    .card-meta {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 10px;
-    }
-    
-    .card-desc {
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 12px;
-    }
-    
-    .card-actions a {
-      font-size: 13px;
-      color: #1d9bf0;
-      text-decoration: none;
-    }
-    
+.title {
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.meta {
+  font-size: 12px;
+  color: gray;
+  margin-top: 4px;
+}
+
+.desc {
+  display: none;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.link {
+  color: #1da1f2;
+  font-size: 12px;
+  display: block;
+  margin-top: 6px;
+}
 </style>
 </head>
+
 <body>
 
-<div class="app">
-  <div class="sidebar">
-    <h3>🌙 Moon</h3>
-    <p>News</p>
-  </div>
-
-  <div class="main">
-    <h1>📰 Timeline</h1>
-    <button onclick="loadNews()">ニュース取得</button>
-
-    <div id="timeline"></div>
-  </div>
+<div class="container">
+  <h2 style="padding:10px;">📰 News Feed</h2>
+  <button onclick="loadNews()">ニュース取得</button>
+  <div id="news"></div>
 </div>
 
 <script>
 async function loadNews() {
   const res = await fetch("/news");
-  const articles = await res.json();
+  const data = await res.json();
 
-  const timeline = document.getElementById("timeline");
-  timeline.innerHTML = "";
+  const container = document.getElementById("news");
+  container.innerHTML = "";
 
-  articles.forEach(article => {
+  data.forEach((article, i) => {
     const card = document.createElement("div");
     card.className = "card";
 
     card.innerHTML = `
-      <div class="card-title">${article.title}</div>
+      <div class="title" onclick="toggle(${i})">
+        ${article.title}
+      </div>
 
-      <div class="card-meta">
+      <div class="meta">
         ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
       </div>
 
-      <div class="card-desc">
-        ${article.description || "（概要情報なし）"}
-      </div>
-
-      <div class="card-actions">
-        <a href="${article.url}" target="_blank">元記事を開く</a>
+      <div id="desc-${i}" class="desc">
+        ${article.description || "No description"}
+        <a class="link" href="${article.url}" target="_blank">元記事へ</a>
       </div>
     `;
 
-    timeline.appendChild(card);
+    container.appendChild(card);
   });
+}
+
+function toggle(i) {
+  const el = document.getElementById(`desc-${i}`);
+  el.style.display = el.style.display === "block" ? "none" : "block";
+}
 </script>
 
 </body>
