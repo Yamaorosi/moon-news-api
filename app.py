@@ -6,6 +6,8 @@ from db.libai_db import init_libai_db, seed_libai_if_empty
 
 
 app = Flask(__name__)
+app.config["JSON_AS_ASCII"] = False
+
 
 init_news_db()
 init_libai_db()
