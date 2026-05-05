@@ -40,3 +40,9 @@ import os
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
+
+@app.route("/libai/list")
+def libai_list():
+    poems = get_all_poems()
+    return jsonify(poems)
