@@ -29,30 +29,37 @@
 
     .card {
       background: #fff;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 16px;
-      margin-top: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-
-.card-title {
+    
+    .card-title {
       font-weight: bold;
       font-size: 16px;
       margin-bottom: 6px;
     }
-
-.card-meta {
-      color: #666;
+    
+    .card-meta {
       font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-.card-desc {
-      font-size: 14px;
-      line-height: 1.6;
+      color: #666;
+      margin-bottom: 10px;
     }
     
-  </style>
+    .card-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    
+    .card-actions a {
+      font-size: 13px;
+      color: #1d9bf0;
+      text-decoration: none;
+    }
+    
+</style>
 </head>
 <body>
 
@@ -84,13 +91,22 @@ async function loadNews() {
 
     card.innerHTML = `
       <div class="card-title">${article.title}</div>
-      <div class="card-meta">${article.source} · ${article.publishedAt}</div>
-      <div class="card-desc">${article.description || "No description"}</div>
+
+      <div class="card-meta">
+        ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
+      </div>
+
+      <div class="card-desc">
+        ${article.description || "（概要情報なし）"}
+      </div>
+
+      <div class="card-actions">
+        <a href="${article.url}" target="_blank">元記事を開く</a>
+      </div>
     `;
 
     timeline.appendChild(card);
   });
-}
 </script>
 
 </body>
