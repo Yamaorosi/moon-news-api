@@ -1,6 +1,7 @@
 # services.py
 import requests
 import os
+from db.libai_db import get_libai_conn
 
 API_KEY = os.getenv("NEWS_API_KEY")
 BASE_URL = "https://newsapi.org/v2/top-headlines"
@@ -31,3 +32,23 @@ def fetch_tech_news():
         }
         for a in articles
     ]
+
+def get_all_poems():
+    conn = get_libai_conn()
+    cur = conn.cursor()
+    rows = cur.execute("""
+        SELECT title, text, dynasty, theme
+        FROM poems
+    """).fetchall()
+    conn.close()
+
+    poems = []
+    for r in rows:
+        poems.append({
+            "title": r[0],
+            "text": r[1],
+            "dynasty": r[2],
+            "theme": r[3]
+        })
+
+    return poems
