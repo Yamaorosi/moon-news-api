@@ -1,3 +1,5 @@
+#/scripts/insert_libai.py
+
 import json
 import os
 from db.libai_db import get_libai_conn
