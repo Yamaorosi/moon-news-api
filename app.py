@@ -25,7 +25,7 @@ def status():
 def news():
 
     params = {
-        "country": "us",
+        "country": "ja",
         "category": "technology",
         "pageSize": 3,
         "apiKey": API_KEY
