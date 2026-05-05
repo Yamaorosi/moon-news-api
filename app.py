@@ -10,7 +10,6 @@ app.config["JSON_AS_ASCII"] = False
 
 init_news_db()
 init_libai_db()
-seed_libai_if_empty()
 
 @app.route("/")
 def home():
