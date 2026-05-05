@@ -46,6 +46,27 @@ body {
   display: block;
   margin-top: 6px;
 }
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tabs button {
+  border: none;
+  background: #eef3f7;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tab {
+  display: none;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
 </style>
 </head>
 
@@ -70,17 +91,28 @@ async function loadNews() {
     card.className = "card";
 
     card.innerHTML = `
-      <div class="title" onclick="toggle(${i})">
-        ${article.title}
-      </div>
+      <div class="title">${article.title}</div>
 
       <div class="meta">
         ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
       </div>
 
-      <div id="desc-${i}" class="desc">
-        ${article.description || "No description"}
-        <a class="link" href="${article.url}" target="_blank">元記事へ</a>
+      <div class="tabs">
+        <button onclick="showTab(${i}, 'body')">本文</button>
+        <button onclick="showTab(${i}, 'structure')">構造</button>
+        <button onclick="showTab(${i}, 'poem')">詩</button>
+      </div>
+
+      <div class="content">
+        <div id="body-${i}" class="tab">
+          ${article.description || "No description"}
+        </div>
+        <div id="structure-${i}" class="tab">
+          （構造はあとで）
+        </div>
+        <div id="poem-${i}" class="tab">
+          （詩はあとで）
+        </div>
       </div>
     `;
 
@@ -88,9 +120,15 @@ async function loadNews() {
   });
 }
 
-function toggle(i) {
-  const el = document.getElementById(`desc-${i}`);
-  el.style.display = el.style.display === "block" ? "none" : "block";
+function showTab(index, type) {
+  const types = ["body", "structure", "poem"];
+  types.forEach(t => {
+    const el = document.getElementById(`${t}-${index}`);
+    if (el) el.style.display = "none";
+  });
+
+  const target = document.getElementById(`${type}-${index}`);
+  if (target) target.style.display = "block";
 }
 </script>
 
