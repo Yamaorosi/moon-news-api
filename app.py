@@ -45,3 +45,13 @@ if __name__ == "__main__":
 @app.route("/libai/list")
 def libai_list():
     return jsonify(get_all_poems())
+
+# 一時的なデータ投入用エンドポイント
+@app.route("/debug/seed-libai")
+def debug_seed_libai():
+    from scripts.insert_libai import insert_poems
+    try:
+        insert_poems()
+        return "✔ データの投入に成功したよ！ /libai/list を確認してみて。"
+    except Exception as e:
+        return f"❌ 失敗: {e}"
