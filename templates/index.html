@@ -243,7 +243,9 @@ function showTab(index, type) {
 async function openLibai() {
   showView("libai");
   const list = document.getElementById("libai-list");
+  const detail = document.getElementById("libai-detail"); // 詳細エリア
   list.innerHTML = "読込中...";
+  detail.innerText = ""; // 切り替え時に詳細をクリア
 
   try {
     const res = await fetch("/libai/list");
@@ -251,23 +253,27 @@ async function openLibai() {
 
     list.innerHTML = "";
 
-    // ✅ ここが正解
-    poems.slice(0, 10).forEach(p => {
+    poems.forEach(p => {
       const div = document.createElement("div");
-      div.style.padding = "12px";
+      div.className = "sidebar-item"; // スタイル使い回し
       div.style.borderBottom = "1px solid #eee";
-      div.style.cursor = "pointer";
+      div.style.color = "#333";
 
       div.innerHTML = `
         <div style="font-weight:bold;">${p.title}</div>
         <div style="font-size:12px;color:gray;">
-          ${p.theme || "no theme"}
+          ${Array.isArray(p.theme) ? p.theme.join(", ") : (p.theme || "no theme")}
         </div>
       `;
 
       div.onclick = () => {
-        document.getElementById("libai-detail").innerText =
-          p.text || JSON.stringify(p, null, 2);
+        // 詩の本文（あれば）や、メタデータを整形して表示
+        // p.text がない場合は、見やすく整形したJSONを表示する
+        const content = p.text || `【テーマ】: ${p.theme}\n【感情】: ${p.emotion}\n【メタファー】:\n${JSON.stringify(p.metaphor, null, 2)}`;
+        detail.innerText = content;
+        
+        // 選択中を分かりやすくするために少しスクロール
+        detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
       };
 
       list.appendChild(div);
