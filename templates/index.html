@@ -4,20 +4,50 @@
   <meta charset="UTF-8">
   <title>News App</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    .card {
-      border: 1px solid #ddd;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-    }
-    .title {
-      font-weight: bold;
-    }
-  </style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f8fa;
+  margin: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 10px;
+}
+
+.card {
+  background: white;
+  border-bottom: 1px solid #e6ecf0;
+  padding: 12px 14px;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.meta {
+  font-size: 12px;
+  color: gray;
+  margin-top: 4px;
+}
+
+.desc {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+  display: none;
+}
+
+.link {
+  margin-top: 6px;
+  display: block;
+  font-size: 12px;
+  color: #1da1f2;
+}
+</style>
 </head>
 <body>
 
@@ -34,18 +64,32 @@ async function loadNews() {
   const container = document.getElementById("news");
   container.innerHTML = "";
 
-  data.forEach(article => {
-    const div = document.createElement("div");
-    div.className = "card";
+  data.forEach((article, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-    div.innerHTML = `
-      <div class="title">${article.title}</div>
-      <div>${article.source}</div>
-      <a href="${article.url}" target="_blank">記事を見る</a>
+    card.innerHTML = `
+      <div class="title" onclick="toggle(${i})">
+        ${article.title}
+      </div>
+
+      <div class="meta">
+        ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
+      </div>
+
+      <div id="desc-${i}" class="desc">
+        ${article.description || "No description"}
+        <a class="link" href="${article.url}" target="_blank">Open original</a>
+      </div>
     `;
 
-    container.appendChild(div);
+    container.appendChild(card);
   });
+}
+
+function toggle(i) {
+  const el = document.getElementById(`desc-${i}`);
+  el.style.display = el.style.display === "block" ? "none" : "block";
 }
 </script>
 
