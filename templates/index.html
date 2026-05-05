@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>News Feed</title>
+<title>Information System</title>
 
 <style>
 body {
@@ -11,11 +11,53 @@ body {
   background: #f5f8fa;
 }
 
-.container {
-  max-width: 600px;
-  margin: auto;
+/* ===== header ===== */
+header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: #111;
+  color: white;
 }
 
+.menu-btn {
+  font-size: 22px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* ===== sidebar ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -220px;
+  width: 200px;
+  height: 100%;
+  background: #222;
+  color: white;
+  padding: 10px;
+  transition: 0.3s;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sidebar-item:hover {
+  background: #333;
+}
+
+/* ===== views ===== */
+.view {
+  padding: 20px;
+}
+
+/* ===== news cards ===== */
 .card {
   background: white;
   border-bottom: 1px solid #e6ecf0;
@@ -25,7 +67,6 @@ body {
 .title {
   font-size: 15px;
   font-weight: bold;
-  cursor: pointer;
 }
 
 .meta {
@@ -34,18 +75,7 @@ body {
   margin-top: 4px;
 }
 
-.desc {
-  display: none;
-  margin-top: 8px;
-  font-size: 14px;
-}
-
-.link {
-  color: #1da1f2;
-  font-size: 12px;
-  display: block;
-  margin-top: 6px;
-}
+/* ===== tabs ===== */
 .tabs {
   display: flex;
   gap: 8px;
@@ -64,21 +94,58 @@ body {
 .tab {
   display: none;
   margin-top: 8px;
-  font-size: 14px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h2 style="padding:10px;">📰 News Feed</h2>
+<!-- ===== header ===== -->
+<header>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <div>Information System</div>
+</header>
+
+<!-- ===== sidebar ===== -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-item" onclick="showView('news')">📰 ニュース</div>
+  <div class="sidebar-item" onclick="openLibai()">📖 原典（李白）</div>
+  <div class="sidebar-item">💾 保存記事（未実装）</div>
+  <div class="sidebar-item">⚙️ 設定（未実装）</div>
+</div>
+
+<!-- ===== NEWS VIEW ===== -->
+<div id="news-view" class="view">
+  <h2>📰 News Feed</h2>
   <button onclick="loadNews()">ニュース取得</button>
   <div id="news"></div>
 </div>
 
+<!-- ===== LIBAI VIEW ===== -->
+<div id="libai-view" class="view" style="display:none;">
+  <h2>📖 李白 原典</h2>
+  <div id="libai-list"></div>
+  <pre id="libai-detail"></pre>
+</div>
+
 <script>
+let poems = [];
+
+/* ===== sidebar ===== */
+function toggleMenu() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+/* ===== view switch ===== */
+function showView(type) {
+  document.getElementById("news-view").style.display =
+    type === "news" ? "block" : "none";
+
+  document.getElementById("libai-view").style.display =
+    type === "libai" ? "block" : "none";
+}
+
+/* ===== NEWS ===== */
 async function loadNews() {
   const res = await fetch("/news");
   const data = await res.json();
@@ -92,7 +159,6 @@ async function loadNews() {
 
     card.innerHTML = `
       <div class="title">${article.title}</div>
-
       <div class="meta">
         ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
       </div>
@@ -103,15 +169,15 @@ async function loadNews() {
         <button onclick="showTab(${i}, 'poem')">詩</button>
       </div>
 
-      <div class="content">
+      <div>
         <div id="body-${i}" class="tab">
           ${article.description || "No description"}
         </div>
         <div id="structure-${i}" class="tab">
-          （構造はあとで）
+          （構造は未実装）
         </div>
         <div id="poem-${i}" class="tab">
-          （詩はあとで）
+          （詩は未実装）
         </div>
       </div>
     `;
@@ -121,8 +187,10 @@ async function loadNews() {
   });
 }
 
+/* tabs */
 function showTab(index, type) {
   const types = ["body", "structure", "poem"];
+
   types.forEach(t => {
     const el = document.getElementById(`${t}-${index}`);
     if (el) el.style.display = "none";
@@ -130,6 +198,31 @@ function showTab(index, type) {
 
   const target = document.getElementById(`${type}-${index}`);
   if (target) target.style.display = "block";
+}
+
+/* ===== LIBAI ===== */
+async function openLibai() {
+  showView("libai");
+
+  const res = await fetch("/libai/list");
+  poems = await res.json();
+
+  const list = document.getElementById("libai-list");
+  list.innerHTML = "";
+
+  poems.forEach(p => {
+    const div = document.createElement("div");
+    div.style.padding = "8px";
+    div.style.cursor = "pointer";
+    div.innerText = p.title;
+
+    div.onclick = () => {
+      document.getElementById("libai-detail").innerText =
+        p.text || JSON.stringify(p, null, 2);
+    };
+
+    list.appendChild(div);
+  });
 }
 </script>
 
