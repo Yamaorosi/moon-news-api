@@ -6,6 +6,9 @@ from db.libai_db import init_libai_db
 
 app = Flask(__name__)
 
+init_news_db()
+init_libai_db()
+
 @app.route("/")
 def home():
     return render_template("index.html")
