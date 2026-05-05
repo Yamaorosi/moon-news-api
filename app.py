@@ -44,5 +44,4 @@ if __name__ == "__main__":
 
 @app.route("/libai/list")
 def libai_list():
-    poems = get_all_poems()
-    return jsonify(poems)
+    return jsonify(get_all_poems())
