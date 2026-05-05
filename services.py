@@ -27,6 +27,7 @@ def fetch_tech_news():
             "source": a["source"]["name"],
             "url": a["url"],
             "publishedAt": a["publishedAt"]
+            "description": a.get("description", "")
         }
         for a in articles
     ]
