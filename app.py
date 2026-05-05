@@ -12,6 +12,13 @@ app.config["JSON_AS_ASCII"] = False
 init_news_db()
 init_libai_db()
 
+from scripts.insert_libai import insert_poems
+try:
+    insert_poems()
+    print("✅ Startup: DB seeding completed.")
+except Exception as e:
+    print(f"❌ Startup: Seeding failed: {e}")
+    
 @app.route("/")
 def home():
     return render_template("index.html")
