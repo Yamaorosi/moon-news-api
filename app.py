@@ -3,11 +3,12 @@ from flask import Flask, render_template, jsonify, request
 from services import fetch_tech_news, get_all_poems
 from db.news_db import init_news_db
 from db.libai_db import init_libai_db
+import os
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
 
-
+# 初期化
 init_news_db()
 init_libai_db()
 
@@ -26,7 +27,6 @@ def debug_libai():
     
 @app.route("/news")
 def news():
-    # 実際の作業は職人（service）に任せて、結果をJSONで返すだけ
     data = fetch_tech_news()
     return jsonify(data)
 
@@ -35,18 +35,12 @@ def article():
     url = request.args.get("url")
     return render_template("article.html", url=url)
 
-
-import os
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
-
+# --- ここから李白関連のエンドポイント ---
 
 @app.route("/libai/list")
 def libai_list():
     return jsonify(get_all_poems())
 
-# 一時的なデータ投入用エンドポイント
 @app.route("/debug/seed-libai")
 def debug_seed_libai():
     from scripts.insert_libai import insert_poems
@@ -55,3 +49,7 @@ def debug_seed_libai():
         return "✔ データの投入に成功したよ！ /libai/list を確認してみて。"
     except Exception as e:
         return f"❌ 失敗: {e}"
+
+# --- app.run は必ず一番最後に書く！ ---
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
