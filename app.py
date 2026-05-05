@@ -2,7 +2,8 @@
 from flask import Flask, render_template, jsonify, request
 from services import fetch_tech_news, get_all_poems
 from db.news_db import init_news_db
-from db.libai_db import init_libai_db
+from db.libai_db import init_libai_db, seed_libai_if_empty
+
 
 app = Flask(__name__)
 
