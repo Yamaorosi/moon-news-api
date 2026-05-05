@@ -45,3 +45,8 @@ def news():
     ]
 
     return jsonify(result)
+
+@app.route("/article")
+def article():
+    url = request.args.get("url")
+    return render_template("article.html", url=url)
