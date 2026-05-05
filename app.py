@@ -16,7 +16,12 @@ def home():
 @app.route("/status")
 def status():
     return jsonify({"status": "ok"})
-
+    
+@app.route("/debug/libai")
+def debug_libai():
+    poems = get_all_poems()
+    return jsonify(poems)
+    
 @app.route("/news")
 def news():
     # 実際の作業は職人（service）に任せて、結果をJSONで返すだけ
