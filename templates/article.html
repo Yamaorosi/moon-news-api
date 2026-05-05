@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Article</title>
+</head>
+<body>
+
+<h1>記事詳細</h1>
+
+<iframe id="frame" width="100%" height="800px"></iframe>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const url = params.get("url");
+
+document.getElementById("frame").src = url;
+</script>
+
+</body>
+</html>
