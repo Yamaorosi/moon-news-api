@@ -1,26 +1,34 @@
-# scripts/insert_libai.py
+import json
+import os
 from db.libai_db import get_libai_conn
 
-poems = [
-    {
-        "title": "静夜思",
-        "text": """床前明月光
-疑是地上霜
-举头望明月
-低头思故乡""",
-        "dynasty": "唐",
-        "theme": "望郷"
-    }
-]
+# JSONファイルの場所
+BASE_DIR = os.path.dirname(__file__)
+JSON_PATH = os.path.join(BASE_DIR, "data", "libai.json")
 
-conn = get_libai_conn()
-cur = conn.cursor()
+def load_poems():
+    with open(JSON_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-for p in poems:
-    cur.execute("""
-    INSERT INTO poems (title, text, dynasty, theme)
-    VALUES (?, ?, ?, ?)
-    """, (p["title"], p["text"], p["dynasty"], p["theme"]))
+def insert_poems():
+    poems = load_poems()
 
-conn.commit()
-conn.close()
+    conn = get_libai_conn()
+    cur = conn.cursor()
+
+    for p in poems:
+        cur.execute("""
+        INSERT OR IGNORE INTO poems (id, title, data)
+        VALUES (?, ?, ?)
+        """, (
+            p["id"],
+            p["title"],
+            json.dumps(p, ensure_ascii=False)
+        ))
+
+    conn.commit()
+    conn.close()
+
+if __name__ == "__main__":
+    insert_poems()
+    print("✔ libai.json をDBに投入完了")
