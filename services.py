@@ -1,13 +1,16 @@
-# services.py
 import requests
 import os
+import json
 from db.libai_db import get_libai_conn
 
 API_KEY = os.getenv("NEWS_API_KEY")
 BASE_URL = "https://newsapi.org/v2/top-headlines"
 
+
+# -------------------------
+# 📰 ニュース取得（そのままOK）
+# -------------------------
 def fetch_tech_news():
-    """News APIから技術ニュースを取得して整形する作業"""
     if not API_KEY:
         return {"error": "API_KEYが設定されてない"}, 500
 
@@ -21,7 +24,6 @@ def fetch_tech_news():
     response = requests.get(BASE_URL, params=params)
     articles = response.json().get("articles", [])
 
-    # 必要なデータだけを抽出する加工処理
     return [
         {
             "title": a["title"],
@@ -33,22 +35,53 @@ def fetch_tech_news():
         for a in articles
     ]
 
+
+# -------------------------
+# 📖 詩データ取得（完成形）
+# -------------------------
 def get_all_poems():
     conn = get_libai_conn()
     cur = conn.cursor()
+
     rows = cur.execute("""
-        SELECT title, text, dynasty, theme
+        SELECT id, title, data
         FROM poems
+        ORDER BY id
     """).fetchall()
+
     conn.close()
 
     poems = []
     for r in rows:
         poems.append({
-            "title": r[0],
-            "text": r[1],
-            "dynasty": r[2],
-            "theme": r[3]
+            "id": r["id"],
+            "title": r["title"],
+            **json.loads(r["data"])   # ←ここで完全復元
         })
 
     return poems
+
+
+# -------------------------
+# 🔍 将来用：単体取得
+# -------------------------
+def get_poem_by_id(poem_id):
+    conn = get_libai_conn()
+    cur = conn.cursor()
+
+    row = cur.execute("""
+        SELECT id, title, data
+        FROM poems
+        WHERE id = ?
+    """, (poem_id,)).fetchone()
+
+    conn.close()
+
+    if not row:
+        return None
+
+    return {
+        "id": row["id"],
+        "title": row["title"],
+        **json.loads(row["data"])
+    }
