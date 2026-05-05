@@ -46,7 +46,8 @@ def article():
 
 @app.route("/libai/list")
 def libai_list():
-    return jsonify(get_all_poems())
+    poems = get_all_poems()
+    return jsonify(poems)
 
 @app.route("/debug/seed-libai")
 def debug_seed_libai():
