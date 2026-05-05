@@ -23,3 +23,26 @@ def init_libai_db():
     """)
     conn.commit()
     conn.close()
+
+def seed_libai_if_empty():
+    conn = get_libai_conn()
+    cur = conn.cursor()
+
+    count = cur.execute("SELECT COUNT(*) FROM poems").fetchone()[0]
+
+    if count == 0:
+        cur.execute("""
+        INSERT INTO poems (title, text, dynasty, theme)
+        VALUES (?, ?, ?, ?)
+        """, (
+            "静夜思",
+            """床前明月光
+疑是地上霜
+举头望明月
+低头思故乡""",
+            "唐",
+            "望郷"
+        ))
+        conn.commit()
+
+    conn.close()
