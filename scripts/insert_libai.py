@@ -2,19 +2,27 @@
 
 import json
 import os
-from db.libai_db import get_libai_conn
+#scripts/ から db/ を読み込めるようになる
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from db.libai_db import get_libai_conn, init_libai_db
 
 # JSONファイルの場所
-BASE_DIR = os.path.dirname(__file__)
-JSON_PATH = os.path.join(BASE_DIR, "data", "libai.json")
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+JSON_PATH = os.path.join(ROOT_DIR, "data", "libai.json")
 
 def load_poems():
+    # ファイルがあるかチェック
+    if not os.path.exists(JSON_PATH):
+        raise FileNotFoundError(f"JSONが見つからないよ: {JSON_PATH}")
+        
     with open(JSON_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
 def insert_poems():
-    poems = load_poems()
+    # 3. 実行前にテーブルを自動で作るようにすると、DBが空の状態でも動く
+    init_libai_db()
 
+    poems = load_poems()
     conn = get_libai_conn()
     cur = conn.cursor()
 
@@ -32,5 +40,8 @@ def insert_poems():
     conn.close()
 
 if __name__ == "__main__":
-    insert_poems()
-    print("✔ libai.json をDBに投入完了")
+    try:
+        insert_poems()
+        print("✔ libai.json をDBに投入完了")
+    except Exception as e:
+        print(f"❌ 失敗しちゃった: {e}")
