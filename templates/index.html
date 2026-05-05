@@ -18,12 +18,25 @@ header {
   padding: 10px;
   background: #111;
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .menu-btn {
   font-size: 22px;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 15px;
+  padding: 0 10px;
+}
+
+/* ===== 中央寄せコンテナ (X風) ===== */
+.main-container {
+  max-width: 600px; /* Xのタイムラインに近い幅 */
+  margin: 0 auto;
+  background: white;
+  min-height: 100vh;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 /* ===== sidebar ===== */
@@ -37,15 +50,30 @@ header {
   color: white;
   padding: 10px;
   transition: 0.3s;
+  z-index: 200;
 }
 
 .sidebar.open {
   left: 0;
 }
 
+/* 背景を暗くするオーバーレイ (メニューが開いている時用) */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 150;
+}
+.sidebar.open + .overlay {
+  display: block;
+}
+
 .sidebar-item {
-  padding: 10px;
+  padding: 15px 10px;
   cursor: pointer;
+  border-bottom: 1px solid #333;
 }
 
 .sidebar-item:hover {
@@ -85,15 +113,17 @@ header {
 .tabs button {
   border: none;
   background: #eef3f7;
-  padding: 4px 8px;
-  border-radius: 12px;
+  padding: 4px 12px;
+  border-radius: 15px;
   font-size: 12px;
   cursor: pointer;
 }
 
 .tab {
   display: none;
-  margin-top: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 </style>
 </head>
@@ -106,34 +136,50 @@ header {
   <div>Information System</div>
 </header>
 
-<!-- ===== sidebar ===== -->
+<!-- ===== sidebar & overlay ===== -->
 <div id="sidebar" class="sidebar">
-  <div class="sidebar-item" onclick="showView('news')">📰 ニュース</div>
-  <div class="sidebar-item" onclick="openLibai()">📖 原典（李白）</div>
+  <div class="sidebar-item" onclick="handleMenuClick('news')">📰 ニュース</div>
+  <div class="sidebar-item" onclick="handleMenuClick('libai')">📖 原典（李白）</div>
   <div class="sidebar-item">💾 保存記事（未実装）</div>
   <div class="sidebar-item">⚙️ 設定（未実装）</div>
 </div>
+<div class="overlay" onclick="toggleMenu()"></div>
 
-<!-- ===== NEWS VIEW ===== -->
-<div id="news-view" class="view">
-  <h2>📰 News Feed</h2>
-  <button onclick="loadNews()">ニュース取得</button>
-  <div id="news"></div>
-</div>
+<!-- ===== MAIN CONTENT AREA ===== -->
+<div class="main-container">
 
-<!-- ===== LIBAI VIEW ===== -->
-<div id="libai-view" class="view" style="display:none;">
-  <h2>📖 李白 原典</h2>
-  <div id="libai-list"></div>
-  <pre id="libai-detail"></pre>
+  <!-- ===== NEWS VIEW ===== -->
+  <div id="news-view" class="view">
+    <h2>📰 News Feed</h2>
+    <button onclick="loadNews()" style="padding: 8px 16px; cursor: pointer;">ニュース取得</button>
+    <div id="news" style="margin-top: 15px;"></div>
+  </div>
+
+  <!-- ===== LIBAI VIEW ===== -->
+  <div id="libai-view" class="view" style="display:none;">
+    <h2>📖 李白 原典</h2>
+    <div id="libai-list"></div>
+    <pre id="libai-detail" style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 5px;"></pre>
+  </div>
+
 </div>
 
 <script>
 let poems = [];
 
-/* ===== sidebar ===== */
+/* ===== sidebar control ===== */
 function toggleMenu() {
   document.getElementById("sidebar").classList.toggle("open");
+}
+
+// 項目クリック時に閉じる処理をまとめる
+function handleMenuClick(type) {
+  toggleMenu(); // メニューを閉じる
+  if (type === 'news') {
+    showView('news');
+  } else if (type === 'libai') {
+    openLibai();
+  }
 }
 
 /* ===== view switch ===== */
@@ -147,55 +193,48 @@ function showView(type) {
 
 /* ===== NEWS ===== */
 async function loadNews() {
-  const res = await fetch("/news");
-  const data = await res.json();
-
   const container = document.getElementById("news");
-  container.innerHTML = "";
+  container.innerHTML = "読込中...";
 
-  data.forEach((article, i) => {
-    const card = document.createElement("div");
-    card.className = "card";
+  try {
+    const res = await fetch("/news");
+    const data = await res.json();
+    container.innerHTML = "";
 
-    card.innerHTML = `
-      <div class="title">${article.title}</div>
-      <div class="meta">
-        ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
-      </div>
-
-      <div class="tabs">
-        <button onclick="showTab(${i}, 'body')">本文</button>
-        <button onclick="showTab(${i}, 'structure')">構造</button>
-        <button onclick="showTab(${i}, 'poem')">詩</button>
-      </div>
-
-      <div>
-        <div id="body-${i}" class="tab">
-          ${article.description || "No description"}
+    data.forEach((article, i) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="title">${article.title}</div>
+        <div class="meta">
+          ${article.source} · ${new Date(article.publishedAt).toLocaleString()}
         </div>
-        <div id="structure-${i}" class="tab">
-          （構造は未実装）
+        <div class="tabs">
+          <button onclick="showTab(${i}, 'body')">本文</button>
+          <button onclick="showTab(${i}, 'structure')">構造</button>
+          <button onclick="showTab(${i}, 'poem')">詩</button>
         </div>
-        <div id="poem-${i}" class="tab">
-          （詩は未実装）
+        <div>
+          <div id="body-${i}" class="tab">${article.description || "No description"}</div>
+          <div id="structure-${i}" class="tab">（構造は未実装）</div>
+          <div id="poem-${i}" class="tab">（詩は未実装）</div>
         </div>
-      </div>
-    `;
-
-    container.appendChild(card);
-    setTimeout(() => showTab(i, "body"), 0);
-  });
+      `;
+      container.appendChild(card);
+      setTimeout(() => showTab(i, "body"), 0);
+    });
+  } catch (e) {
+    container.innerHTML = "ニュースの取得に失敗しました。";
+  }
 }
 
 /* tabs */
 function showTab(index, type) {
   const types = ["body", "structure", "poem"];
-
   types.forEach(t => {
     const el = document.getElementById(`${t}-${index}`);
     if (el) el.style.display = "none";
   });
-
   const target = document.getElementById(`${type}-${index}`);
   if (target) target.style.display = "block";
 }
@@ -203,26 +242,30 @@ function showTab(index, type) {
 /* ===== LIBAI ===== */
 async function openLibai() {
   showView("libai");
-
-  const res = await fetch("/libai/list");
-  poems = await res.json();
-
   const list = document.getElementById("libai-list");
-  list.innerHTML = "";
+  list.innerHTML = "読込中...";
 
-  poems.forEach(p => {
-    const div = document.createElement("div");
-    div.style.padding = "8px";
-    div.style.cursor = "pointer";
-    div.innerText = p.title;
+  try {
+    const res = await fetch("/libai/list");
+    poems = await res.json();
+    list.innerHTML = "";
 
-    div.onclick = () => {
-      document.getElementById("libai-detail").innerText =
-        p.text || JSON.stringify(p, null, 2);
-    };
+    poems.forEach(p => {
+      const div = document.createElement("div");
+      div.style.padding = "12px";
+      div.style.borderBottom = "1px solid #eee";
+      div.style.cursor = "pointer";
+      div.innerText = p.title;
 
-    list.appendChild(div);
-  });
+      div.onclick = () => {
+        document.getElementById("libai-detail").innerText =
+          p.text || JSON.stringify(p, null, 2);
+      };
+      list.appendChild(div);
+    });
+  } catch (e) {
+    list.innerHTML = "李白データの取得に失敗しました。";
+  }
 }
 </script>
 
