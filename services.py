@@ -52,11 +52,17 @@ def get_all_poems():
     conn.close()
 
     poems = []
+
     for r in rows:
+        try:
+            data = json.loads(r["data"]) if r["data"] else {}
+        except json.JSONDecodeError:
+            data = {}
+
         poems.append({
             "id": r["id"],
             "title": r["title"],
-            **json.loads(r["data"])   # ←ここで完全復元
+            **data
         })
 
     return poems
