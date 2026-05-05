@@ -11,7 +11,7 @@ def fetch_tech_news():
         return {"error": "API_KEYが設定されてない"}, 500
 
     params = {
-        "country": "us",
+        "country": "jp",
         "category": "technology",
         "pageSize": 3,
         "apiKey": API_KEY
