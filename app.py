@@ -18,6 +18,18 @@ try:
     print("✅ Startup: DB seeding completed.")
 except Exception as e:
     print(f"❌ Startup: Seeding failed: {e}")
+
+
+from scripts.insert_news import insert_news
+
+try:
+    insert_news()
+    print("✅ Startup: News seeding completed.")
+except Exception as e:
+    print(f"❌ Startup: News seeding failed: {e}")
+
+
+    
     
 @app.route("/")
 def home():
