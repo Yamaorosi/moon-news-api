@@ -24,3 +24,15 @@ def init_news_db():
     """)
     conn.commit()
     conn.close()
+
+
+def seed_news_if_empty():
+    conn = get_news_conn()
+    cur = conn.cursor()
+    count = cur.execute("SELECT COUNT(*) FROM news").fetchone()[0]
+    conn.close()
+
+    if count == 0:
+        from services import fetch_and_store_news
+        fetch_and_store_news()
+        print("🌱 news seeded")

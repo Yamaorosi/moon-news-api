@@ -1,47 +1,23 @@
 # app.py
+
 from flask import Flask, render_template, jsonify, request
 from services import fetch_tech_news, get_all_poems, fetch_and_store_news
-from db.news_db import init_news_db, get_news_conn
-from db.libai_db import init_libai_db
+from db.news_db import init_news_db, get_news_conn, seed_news_if_empty
+from db.libai_db import init_libai_db, seed_libai_if_empty, get_libai_conn
 import os
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
 
-
-from db.libai_db import seed_libai_if_empty
-
-seed_libai_if_empty()
-print("🌱 seed checked")
-
-
-# 初期化
+# --- 初期化 ---
 init_news_db()
 init_libai_db()
 
-from scripts.insert_libai import insert_poems
-try:
-    insert_poems()
-    print("✅ Startup: DB seeding completed.")
-except Exception as e:
-    print(f"❌ Startup: Seeding failed: {e}")
+# --- seed（空なら入れる） ---
+seed_libai_if_empty()
+seed_news_if_empty()
 
-
-from scripts.insert_news import insert_news
-
-def is_news_empty():
-    conn = get_news_conn()
-    cur = conn.cursor()
-    count = cur.execute("SELECT COUNT(*) FROM news").fetchone()[0]
-    conn.close()
-    return count == 0
-
-try:
-    if is_news_empty():
-        insert_news()
-        print("✅ Startup: News seeded")
-except Exception as e:
-    print("❌ Startup: News seeding failed:", e)
+print("🌱 seeds checked")
 
 
 
@@ -120,7 +96,7 @@ def debug_count():
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM poems")
     return {"count": cur.fetchone()[0]}
-    
+
 
 
 # --- app.run は必ず一番最後に書く！ ---

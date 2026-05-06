@@ -103,3 +103,18 @@ def debug_print_all():
     poems = get_all_poems()
     for p in poems:
         print(p["id"], p["title"])
+
+
+        
+def seed_libai_if_empty():
+    conn = get_libai_conn()
+    cur = conn.cursor()
+    count = cur.execute("SELECT COUNT(*) FROM poems").fetchone()[0]
+    conn.close()
+
+    if count == 0:
+        from scripts.insert_libai import insert_poems
+        insert_poems()
+        print("🌱 libai seeded")
+    else:
+        print("🌱 libai already exists")
