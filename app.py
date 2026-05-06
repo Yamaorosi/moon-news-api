@@ -1,6 +1,6 @@
 # app.py
 from flask import Flask, render_template, jsonify, request
-from services import fetch_tech_news, get_all_poems
+from services import fetch_tech_news, get_all_poems,fetch_and_store_news
 from db.news_db import init_news_db
 from db.libai_db import init_libai_db
 import os
