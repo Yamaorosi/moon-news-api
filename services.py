@@ -93,11 +93,11 @@ def fetch_and_store_news():
             VALUES (?, ?, ?, ?, ?)
         """, (
             a["title"],
-            a["description"],   # bodyに入れる
+            summary,
             a["source"],
             a["url"],
             a["publishedAt"]
-        ))  
+        ))
 
     conn.commit()
     conn.close()

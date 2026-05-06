@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask, render_template, jsonify, request
-from services import fetch_tech_news, get_all_poems,fetch_and_store_news
-from db.news_db import init_news_db, get_news_conn,init_news_db
+from services import fetch_tech_news, get_all_poems, fetch_and_store_news
+from db.news_db import init_news_db, get_news_conn
 from db.libai_db import init_libai_db
 import os
 
@@ -22,14 +22,22 @@ except Exception as e:
 
 from scripts.insert_news import insert_news
 
+def is_news_empty():
+    conn = get_news_conn()
+    cur = conn.cursor()
+    count = cur.execute("SELECT COUNT(*) FROM news").fetchone()[0]
+    conn.close()
+    return count == 0
+
 try:
-    insert_news()
-    print("✅ Startup: News seeding completed.")
+    if is_news_empty():
+        insert_news()
+        print("✅ Startup: News seeded")
 except Exception as e:
-    print(f"❌ Startup: News seeding failed: {e}")
+    print("❌ Startup: News seeding failed:", e)
 
 
-    
+
     
 @app.route("/")
 def home():
