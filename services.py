@@ -2,6 +2,8 @@ import requests
 import os
 import json
 from db.libai_db import get_libai_conn
+from db.news_db import get_news_conn
+
 
 API_KEY = os.getenv("NEWS_API_KEY")
 BASE_URL = "https://newsapi.org/v2/top-headlines"
@@ -66,6 +68,40 @@ def get_all_poems():
         })
 
     return poems
+
+
+
+# -------------------------
+# バッチ処理
+# -------------------------
+def make_summary(article):
+    desc = article.get("description") or ""
+    return desc.replace("\n", " ").strip()
+
+
+def fetch_and_store_news():
+    articles = fetch_tech_news()
+
+    conn = get_news_conn()
+    cur = conn.cursor()
+
+    for a in articles:
+        summary = make_summary(a)
+
+        cur.execute("""
+            INSERT INTO news (title, description, summary, source, publishedAt)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            a["title"],
+            a["description"],
+            summary,
+            a["source"],
+            a["publishedAt"]
+        ))
+
+    conn.commit()
+    conn.close()
+
 
 
 # -------------------------

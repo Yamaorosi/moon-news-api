@@ -58,6 +58,13 @@ def debug_seed_libai():
     except Exception as e:
         return f"❌ 失敗: {e}"
 
+
+@app.route("/update-news")
+def update_news():
+    fetch_and_store_news()
+    return {"status": "ok"}
+    
+
 # --- app.run は必ず一番最後に書く！ ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
