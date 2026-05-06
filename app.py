@@ -39,8 +39,14 @@ def debug_libai():
 def news():
     conn = get_news_conn()
     cur = conn.cursor()
+    # ASを使ってフロントが期待するキー名（publishedAt, description）に変える
     rows = cur.execute("""
-        SELECT title, source, url, created_at
+        SELECT 
+            title, 
+            source, 
+            url, 
+            created_at AS publishedAt, 
+            body AS description
         FROM news
         ORDER BY created_at DESC
         LIMIT 3
@@ -100,10 +106,20 @@ def debug_news():
 
 @app.route("/debug/count")
 def debug_count():
-    conn = get_libai_conn()
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM poems")
-    return {"count": cur.fetchone()[0]}
+    # 李白のカウント
+    conn_l = get_libai_conn()
+    count_l = conn_l.execute("SELECT COUNT(*) FROM poems").fetchone()[0]
+    conn_l.close()
+    
+    # ニュースのカウント
+    conn_n = get_news_conn()
+    count_n = conn_n.execute("SELECT COUNT(*) FROM news").fetchone()[0]
+    conn_n.close()
+    
+    return {
+        "libai_count": count_l,
+        "news_count": count_n
+    }
 
 
 
