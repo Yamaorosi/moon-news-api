@@ -1,6 +1,8 @@
 import requests
 import os
 import json
+import re
+from html import unescape
 from db.libai_db import get_libai_conn
 from db.news_db import get_news_conn
 
@@ -77,7 +79,20 @@ def get_all_poems():
 # -------------------------
 def make_summary(article):
     desc = article.get("description") or ""
-    return desc.replace("\n", " ").strip()
+
+    # HTMLエスケープ解除 (&quot; など)
+    text = unescape(desc)
+
+    # HTMLタグ除去（念のため）
+    text = re.sub(r"<[^>]+>", "", text)
+
+    # URL除去（RAGのノイズになりやすい）
+    text = re.sub(r"https?://\S+", "", text)
+
+    # 改行・タブ・多重スペースを1つにまとめる
+    text = re.sub(r"\s+", " ", text)
+
+    return text.strip()
 
 
 def fetch_and_store_news():
