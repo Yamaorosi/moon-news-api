@@ -61,9 +61,13 @@ def debug_seed_libai():
 
 @app.route("/update-news")
 def update_news():
-    fetch_and_store_news()
-    return {"status": "ok"}
-    
+    try:
+        fetch_and_store_news()
+        return {"status": "ok"}
+    except Exception as e:
+        print("ERROR:", e)
+        return {"status": "error", "message": str(e)}, 500
+
 
 # --- app.run は必ず一番最後に書く！ ---
 if __name__ == "__main__":
