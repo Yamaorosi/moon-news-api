@@ -8,6 +8,13 @@ import os
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
 
+
+from db.libai_db import seed_libai_if_empty
+
+seed_libai_if_empty()
+print("🌱 seed checked")
+
+
 # 初期化
 init_news_db()
 init_libai_db()
@@ -107,6 +114,13 @@ def debug_news():
         dict(r) for r in rows
     ]
 
+@app.route("/debug/count")
+def debug_count():
+    conn = get_libai_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM poems")
+    return {"count": cur.fetchone()[0]}
+    
 
 
 # --- app.run は必ず一番最後に書く！ ---
