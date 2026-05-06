@@ -37,8 +37,16 @@ def debug_libai():
     
 @app.route("/news")
 def news():
-    data = fetch_tech_news()
-    return jsonify(data)
+    conn = get_news_conn()
+    cur = conn.cursor()
+    rows = cur.execute("""
+        SELECT title, source, url, created_at
+        FROM news
+        ORDER BY created_at DESC
+        LIMIT 3
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 @app.route("/article")
 def article():
