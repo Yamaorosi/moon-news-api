@@ -14,7 +14,8 @@ BASE_URL = "https://newsapi.org/v2/top-headlines"
 # -------------------------
 def fetch_tech_news():
     if not API_KEY:
-        return {"error": "API_KEYが設定されてない"}, 500
+        print("⚠️ NEWS_API_KEY not set")
+        return []
 
     params = {
         "country": "us",
@@ -80,13 +81,17 @@ def make_summary(article):
 
 
 def fetch_and_store_news():
+    print("🚀 fetch_and_store_news called")
+
     articles = fetch_tech_news()
+    print("📰 fetched articles:", len(articles))
 
     conn = get_news_conn()
     cur = conn.cursor()
 
     for a in articles:
         summary = make_summary(a)
+        print("➕ inserting:", a["title"])
 
         cur.execute("""
             INSERT OR IGNORE INTO news (title, body, source, url, created_at)
@@ -101,7 +106,7 @@ def fetch_and_store_news():
 
     conn.commit()
     conn.close()
-
+    print("✅ news commit done")
 
 
 # -------------------------
