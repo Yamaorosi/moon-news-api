@@ -89,15 +89,15 @@ def fetch_and_store_news():
         summary = make_summary(a)
 
         cur.execute("""
-            INSERT INTO news (title, description, summary, source, publishedAt)
+            INSERT OR IGNORE INTO news (title, body, source, url, created_at)
             VALUES (?, ?, ?, ?, ?)
         """, (
             a["title"],
-            a["description"],
-            summary,
+            a["description"],   # bodyに入れる
             a["source"],
+            a["url"],
             a["publishedAt"]
-        ))
+        ))  
 
     conn.commit()
     conn.close()
