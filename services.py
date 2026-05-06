@@ -147,3 +147,27 @@ def get_poem_by_id(poem_id):
         "title": row["title"],
         **json.loads(row["data"])
     }
+
+# -------------------------
+# RAG下処理
+# -------------------------
+def build_libai_search_text(poem):
+    parts = []
+
+    parts.append(poem.get("title", ""))
+
+    if poem.get("theme"):
+        parts.append("テーマ: " + " ".join(poem["theme"]))
+
+    if poem.get("emotion"):
+        parts.append("感情: " + " ".join(poem["emotion"]))
+
+    if poem.get("keywords"):
+        parts.append("象徴: " + " ".join(poem["keywords"]))
+
+    if poem.get("metaphor"):
+        parts.append(
+            "比喩: " + " ".join(poem["metaphor"].keys())
+        )
+
+    return " / ".join(parts)
