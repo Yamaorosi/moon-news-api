@@ -1,2 +1,2 @@
-# moon-news-apiREADME.mdに追記
+# moon-news-api
 README.mdに追記
